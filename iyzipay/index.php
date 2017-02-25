@@ -228,7 +228,6 @@ function iyzipay_capture($params)
 
     /* Create payment request */
     $request = new \Iyzipay\Request\CreatePaymentRequest();
-    $request->setPaymentSource("TRICEPS");
     $request->setLocale(\Iyzipay\Model\Locale::EN);
     $request->setConversationId($params['conversationId']);
     $request->setPrice($invoiceTotal);
@@ -372,7 +371,6 @@ function iyzipay_3dsecure($params)
 
     /* Create payment request */
     $request = new \Iyzipay\Request\CreatePaymentRequest();
-    $request->setPaymentSource("TRICEPS");
     $request->setLocale(\Iyzipay\Model\Locale::EN);
     $request->setConversationId($params['conversationId']);
     $request->setPrice($invoiceTotal);
