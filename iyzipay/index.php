@@ -2,23 +2,12 @@
 /**
  * WHMCS Iyzipay Merchant Gateway Module
  *
- * Requirements:
- *
- * - WHMCS > 6.0 (untested below WHMCS below 6.0)
- * - PHP > 5.3.7
- * - Composer (https://getcomposer.org/) if you checkout the code from git
- *
- * This gateway module implements Iyzipay's payment API and leverages Iyzipay's
- * credit card storage.
- *
- * When a user adds or removes a credit card, it will be stored on Iyzico's
- * servers. WHMCS only stores the last 4 digits and expiration date of the cc.
- *
- * - This module currently does not support installments.
- * - You can only accept TRY payments at the moment.
- *
- * @copyright Copyright (c) (Tahir Can Ozokur - 4-bit) 2016
- * @license MIT - See the LICENSE file for details.
+ * Author: Milos Markovic
+ * Company: The Web Tailor, Inc.
+ * Version: 1.0
+ * Description: Iyzico Merchant Gateway Module For WHMCS
+ * 
+ * @copyright Copyright (c) 2017 The Web Tailor, Inc.
  */
 
 if (!defined("WHMCS")) {
