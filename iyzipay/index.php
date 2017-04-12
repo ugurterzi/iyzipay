@@ -207,6 +207,108 @@ function iyzipay_config()
     );
 }
 
+function iyzipay_link($params) {
+    $baseUrl = set_base_url($params);
+    
+    $systemurl = $params['systemurl'];
+    $moduleName = $params['paymentmethod'];
+    
+    $invoiceItems = get_invoice_items($params['invoiceid']);
+    $invoiceTotal = get_invoice_total($params['invoiceid']);
+    $ccExpireMonth = substr($params['cardexp'], 0, 2);
+    $ccExpireYear = date("Y", mktime(0, 0, 0, 1, 1, substr($params['cardexp'], 2, 2)));
+    $clientId = get_user_id($params['invoiceid']);
+    $clientAddress = ($params['clientdetails']['address2']) ? $params['clientdetails']['address1'] . " " . $params['clientdetails']['address2'] : $params['clientdetails']['address1'];
+    $clientIP = $_SERVER['REMOTE_ADDR'];
+    $tcKimlik = get_tckimlik($params);
+    
+    /* Create Iyzipay API options */
+    $options = new \Iyzipay\Options();
+    $options->setApiKey($params['apiKey']);
+    $options->setSecretKey($params['secretKey']);
+    $options->setBaseUrl($baseUrl);
+    
+    /* Request */
+    $request = new \Iyzipay\Request\CreateCheckoutFormInitializeRequest();
+    $request->setCallbackUrl($systemurl . '/modules/gateways/callback/' . $moduleName . '.php');
+    $request->setPaymentSource("TRICEPS");
+    $request->setLocale(\Iyzipay\Model\Locale::EN);
+    $request->setConversationId($params['conversationId']);
+    $request->setPrice($invoiceTotal);
+    $request->setPaidPrice($params['amount']);
+    $request->setCurrency($params['currency']);
+    $request->setBasketId($params['invoiceid']);
+    $request->setPaymentGroup(\Iyzipay\Model\PaymentGroup::SUBSCRIPTION);
+
+    /* Create buyer details */
+    $buyer = new \Iyzipay\Model\Buyer();
+    $buyer->setId($clientId);
+    $buyer->setName($params['clientdetails']['firstname']);
+    $buyer->setSurname($params['clientdetails']['lastname']);
+    $buyer->setEmail($params['clientdetails']['email']);
+    $buyer->setIdentityNumber($tcKimlik);
+    $buyer->setRegistrationAddress($clientAddress);
+    $buyer->setIp($clientIP);
+    $buyer->setCity($params['clientdetails']['city']);
+    $buyer->setCountry($params['clientdetails']['country']);
+    $buyer->setGsmNumber($params['clientdetails']['phonenumber']);
+    if (NULL != $params['clientdetails']['postcode'])
+    {
+        $buyer->setZipCode($params['clientdetails']['postcode']);
+    }
+    $request->setBuyer($buyer);
+
+    /* Create billing address */
+    $billingAddress = new \Iyzipay\Model\Address();
+    $billingAddress->setContactName($params['clientdetails']['fullname']);
+    $billingAddress->setCity($params['clientdetails']['city']);
+    $billingAddress->setCountry($params['clientdetails']['country']);
+    $billingAddress->setAddress($clientAddress);
+    if (NULL != $params['clientdetails']['postcode'])
+    {
+        $billingAddress->setZipCode($params['clientdetails']['postcode']);
+    }
+    $request->setBillingAddress($billingAddress);
+
+    /* Create basket items array and set them */
+    $basketItems = array();
+    foreach ($invoiceItems as $invoiceItem)
+    {
+        if ($invoiceItem->amount < 0)
+        {
+            $promo = array_pop($basketItems);
+            $promoPrice = $promo->getPrice();
+            $promoPrice = $promoPrice + $invoiceItem->amount;
+            if ($promoPrice == 0)
+            {
+                continue;
+            } else {
+                $promo->setPrice($promoPrice);
+                array_push($basketItems, $promo);
+            }
+            continue;
+        }
+        $basketItem = new \Iyzipay\Model\BasketItem();
+        $basketItem->setId($invoiceItem->id);
+        $basketItem->setName($invoiceItem->description);
+        if (NULL == $invoiceItem->type)
+        {
+            $basketItem->setCategory1("Misc");
+        } else {
+            $basketItem->setCategory1($invoiceItem->type);
+        }
+        $basketItem->setItemType(\Iyzipay\Model\BasketItemType::VIRTUAL);
+        $basketItem->setPrice("$invoiceItem->amount");
+        if($invoiceItem->amount != 0) {
+            array_push($basketItems, $basketItem);
+        }
+    }
+    $request->setBasketItems($basketItems);
+    
+    $response = \Iyzipay\Model\CheckoutFormInitialize::create($request, $options);
+    return '<div class="popup" id="iyzipay-checkout-form"></div>' . $response->getCheckoutFormContent();
+}
+
 function iyzipay_capture($params)
 {
     // test mode aciksa API adresini degistirelim
