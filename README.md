@@ -19,6 +19,12 @@ Note: You can test the module by creating a free iyzico sandbox account via http
 3- In the Payment Gateways page please select the "All Payment Gateways" tab and scroll & find & click iyzipay. The page reloads you into  Manage Existing Gateways page which you can configure the payment gateways that you already wanted to use.<br />
 4- Scroll to Iyzipay module and enter your Iyzipay credentials such as API and Secret Keys.<br />
 
+## Localization ##
+
+If you want to change the order form's language you should open /modules/gateways/iyzipay/index.php and change the related line:
+from: \Iyzipay\Model\Locale::EN
+to: \Iyzipay\Model\Locale::TR
+
 ## iyzico ##
 
 As you can figure out you will need an iyzico account to use this module. You can simply signup via https://www.iyzico.com/en/ or you may want to test it first. It is pretty easy too. You can create a sandbox account via https://sandbox-merchant.iyzipay.com/register in just a few minutes and run some tests.
