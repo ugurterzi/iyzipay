@@ -21,8 +21,8 @@ Note: You can test the module by creating a free iyzico sandbox account via http
 
 ## Localization ##
 
-If you want to change the order form's language you should open /modules/gateways/iyzipay/index.php and change the related line:
-from: \Iyzipay\Model\Locale::EN
+If you want to change the order form's language you should open /modules/gateways/iyzipay/index.php and change the related line:<br />
+from: \Iyzipay\Model\Locale::EN<br />
 to: \Iyzipay\Model\Locale::TR
 
 ## iyzico ##
